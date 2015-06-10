@@ -577,7 +577,9 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
     NSString *accountType;
     @synchronized (self.pendingOAuthClients) {
         accountType = [self accountTypeOfPendingOAuthClient:client];
-        [self.pendingOAuthClients removeObjectForKey:accountType];
+        if (accountType) {
+            [self.pendingOAuthClients removeObjectForKey:accountType];
+        }
     }
 
     NXOAuth2Account *account = [[NXOAuth2Account alloc] initAccountWithOAuthClient:client accountType:accountType];
@@ -648,7 +650,9 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
     NSString *accountType;
     @synchronized (self.pendingOAuthClients) {
         accountType = [self accountTypeOfPendingOAuthClient:client];
-        [self.pendingOAuthClients removeObjectForKey:accountType];
+        if (accountType) {
+            [self.pendingOAuthClients removeObjectForKey:accountType];
+        }
     }
 
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
