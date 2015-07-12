@@ -235,6 +235,18 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
     }
 }
 
+- (void)refreshAccounts {
+    @synchronized (self.accountsDict) {
+        NSDictionary* accountsDictOld = [accountsDict copy];
+        accountsDict = nil;
+        NSDictionary* accountsDictNew = self.accountsDict;
+        
+        if (accountsDictOld.count != accountsDictNew.count) {
+           [[NSNotificationCenter defaultCenter] postNotificationName:NXOAuth2AccountStoreAccountsDidChangeNotification object:self];
+        }
+    }
+}
+
 #pragma mark Configuration
 
 - (void)setClientID:(NSString *)aClientID

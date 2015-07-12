@@ -139,6 +139,7 @@ typedef void(^NXOAuth2PreparedAuthorizationURLHandler)(NSURL *preparedURL);
 - (void)requestClientCredentialsAccessWithType:(NSString *)accountType;
 - (void)addAccount:(NXOAuth2Account *)account;
 - (void)removeAccount:(NXOAuth2Account *)account;
+- (void)refreshAccounts;
 
 
 #pragma mark Handle OAuth Redirects
