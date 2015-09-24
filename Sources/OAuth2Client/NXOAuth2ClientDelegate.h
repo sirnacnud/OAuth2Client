@@ -28,6 +28,8 @@
 - (void)oauthClientDidGetAccessToken:(NXOAuth2Client *)client;
 - (void)oauthClientDidLoseAccessToken:(NXOAuth2Client *)client;
 - (void)oauthClientDidRefreshAccessToken:(NXOAuth2Client *)client;
+- (void)oauthClientDidRevokeAccessToken:(NXOAuth2Client *)client;
 - (void)oauthClient:(NXOAuth2Client *)client didFailToGetAccessTokenWithError:(NSError *)error;
+- (void)oauthClient:(NXOAuth2Client *)client didFailToRevokeTokenWithError:(NSError *)error;
 
 @end

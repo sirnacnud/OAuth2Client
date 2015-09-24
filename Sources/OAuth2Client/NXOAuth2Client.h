@@ -18,6 +18,7 @@
 
 extern NSString * const NXOAuth2ClientConnectionContextTokenRequest;
 extern NSString * const NXOAuth2ClientConnectionContextTokenRefresh;
+extern NSString * const NXOAuth2ClientConnectionContextTokenRevoke;
 
 @class NXOAuth2Connection, NXOAuth2AccessToken;
 
@@ -47,6 +48,7 @@ extern NSString * const NXOAuth2ClientConnectionContextTokenRefresh;
     
     // server information
     NSURL        *authorizeURL;
+    NSURL        *revokeURL;
     NSURL        *tokenURL;
     NSString     *tokenType;
     
@@ -70,6 +72,7 @@ extern NSString * const NXOAuth2ClientConnectionContextTokenRefresh;
 
 @property (nonatomic, copy) NSSet *desiredScope;
 @property (nonatomic, copy) NSString *tokenRequestHTTPMethod; // defaults to POST
+@property (nonatomic, copy) NSString *tokenRevokeHTTPMethod; // defaults to POST
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, copy) NSString *acceptType; // defaults to application/json
 
@@ -107,6 +110,7 @@ extern NSString * const NXOAuth2ClientConnectionContextTokenRefresh;
                     clientSecret:(NSString *)clientSecret
                     authorizeURL:(NSURL *)authorizeURL
                         tokenURL:(NSURL *)tokenURL
+                       revokeURL:(NSURL *)revokeURL
                      accessToken:(NXOAuth2AccessToken *)accessToken
                        tokenType:(NSString *)tokenType
                    keyChainGroup:(NSString *)keyChainGroup
@@ -149,5 +153,7 @@ extern NSString * const NXOAuth2ClientConnectionContextTokenRefresh;
 
 - (void)refreshAccessToken;
 - (void)refreshAccessTokenAndRetryConnection:(NXOAuth2Connection *)retryConnection;
+
+- (void)revokeAccessToken;
 
 @end

@@ -22,6 +22,7 @@
 
 NSString * const NXOAuth2ClientConnectionContextTokenRequest = @"tokenRequest";
 NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
+NSString * const NXOAuth2ClientConnectionContextTokenRevoke = @"tokenRevoke";
 
 
 @interface NXOAuth2Client ()
@@ -68,6 +69,7 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
                      clientSecret:aClientSecret
                      authorizeURL:anAuthorizeURL
                          tokenURL:aTokenURL
+                        revokeURL:nil
                       accessToken:anAccessToken
                         tokenType:nil
                     keyChainGroup:aKeyChainGroup
@@ -80,6 +82,7 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
                     clientSecret:(NSString *)aClientSecret
                     authorizeURL:(NSURL *)anAuthorizeURL
                         tokenURL:(NSURL *)aTokenURL
+                       revokeURL:(NSURL *)aRevokeURL
                      accessToken:(NXOAuth2AccessToken *)anAccessToken
                        tokenType:(NSString *)aTokenType
                    keyChainGroup:(NSString *)aKeyChainGroup
@@ -96,10 +99,12 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
         clientSecret = [aClientSecret copy];
         authorizeURL = [anAuthorizeURL copy];
         tokenURL = [aTokenURL copy];
+        revokeURL = [aRevokeURL copy];
         tokenType = [aTokenType copy];
         accessToken = anAccessToken;
         
         self.tokenRequestHTTPMethod = @"POST";
+        self.tokenRevokeHTTPMethod = @"POST";
         self.acceptType = @"application/json";
         keyChainGroup = aKeyChainGroup;
         keyChainAccessGroup = aKeyChainAccessGroup;
@@ -474,6 +479,28 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
     }
 }
 
+- (void)revokeAccessToken;
+{
+    if (!authConnection) {
+        NSAssert((revokeURL != nil), @"must supply revoke URL with account configuration");
+        NSMutableURLRequest *tokenRequest = [NSMutableURLRequest requestWithURL:revokeURL];
+        [tokenRequest setHTTPMethod:self.tokenRevokeHTTPMethod];
+        [authConnection cancel];
+        
+        NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                           clientId, @"client_id",
+                                           clientSecret, @"client_secret",
+                                           accessToken.accessToken, @"token",
+                                           nil];
+        
+        authConnection = [[NXOAuth2Connection alloc] initWithRequest:tokenRequest
+                                                   requestParameters:parameters
+                                                         oauthClient:self
+                                                            delegate:self];
+        authConnection.context = NXOAuth2ClientConnectionContextTokenRevoke;
+    }
+}
+
 - (void)removeConnectionFromWaitingQueue:(NXOAuth2Connection *)aConnection;
 {
     if (!aConnection) return;
@@ -489,18 +516,25 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
         self.authenticating = NO;
 
         NSString *result = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        NXOAuth2AccessToken *newToken = [NXOAuth2AccessToken tokenWithResponseBody:result tokenType:self.tokenType
-                                         ];
-        NSAssert(newToken != nil, @"invalid response?");
         
-        [newToken restoreWithOldToken:self.accessToken];
-        
-        self.accessToken = newToken;
-        
-        for (NXOAuth2Connection *retryConnection in waitingConnections) {
-            [retryConnection retry];
+        if ([authConnection.context isEqualToString:NXOAuth2ClientConnectionContextTokenRevoke]) {
+            if ([delegate respondsToSelector:@selector(oauthClientDidRevokeAccessToken:)]) {
+                [delegate oauthClientDidRevokeAccessToken:self];
+            }
+        } else {
+            NXOAuth2AccessToken *newToken = [NXOAuth2AccessToken tokenWithResponseBody:result tokenType:self.tokenType
+                                             ];
+            NSAssert(newToken != nil, @"invalid response?");
+            
+            [newToken restoreWithOldToken:self.accessToken];
+            
+            self.accessToken = newToken;
+            
+            for (NXOAuth2Connection *retryConnection in waitingConnections) {
+                [retryConnection retry];
+            }
+            [waitingConnections removeAllObjects];
         }
-        [waitingConnections removeAllObjects];
         
         authConnection = nil;
         
@@ -552,8 +586,14 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
                 self.accessToken = nil;        // reset the token since it got invalid
             }
             
-            if ([delegate respondsToSelector:@selector(oauthClient:didFailToGetAccessTokenWithError:)]) {
-                [delegate oauthClient:self didFailToGetAccessTokenWithError:error];
+            if ([context isEqualToString:NXOAuth2ClientConnectionContextTokenRevoke]) {
+                if ([delegate respondsToSelector:@selector(oauthClient:didFailToRevokeTokenWithError:)]) {
+                    [delegate oauthClient:self didFailToRevokeTokenWithError:error];
+                }
+            } else {
+                if ([delegate respondsToSelector:@selector(oauthClient:didFailToGetAccessTokenWithError:)]) {
+                    [delegate oauthClient:self didFailToGetAccessTokenWithError:error];
+                }
             }
         }
     }

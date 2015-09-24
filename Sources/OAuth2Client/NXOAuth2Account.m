@@ -28,7 +28,9 @@
 NSString * const NXOAuth2AccountDidChangeUserDataNotification = @"NXOAuth2AccountDidChangeUserDataNotification";
 NSString * const NXOAuth2AccountDidChangeAccessTokenNotification = @"NXOAuth2AccountDidChangeAccessTokenNotification";
 NSString * const NXOAuth2AccountDidLoseAccessTokenNotification = @"NXOAuth2AccountDidLoseAccessTokenNotification";
+NSString * const NXOAuth2AccountDidRevokeAccessTokenNotification = @"NXOAuth2AccountDidRevokeAccessTokenNotification";
 NSString * const NXOAuth2AccountDidFailToGetAccessTokenNotification = @"NXOAuth2AccountDidFailToGetAccessTokenNotification";
+NSString * const NXOAuth2AccountDidFailToRevokeAccessTokenNotification = @"NXOAuth2AccountDidFailToRevokeAccessTokenNotification";
 
 #pragma mark -
 
@@ -92,6 +94,7 @@ NSString * const NXOAuth2AccountDidFailToGetAccessTokenNotification = @"NXOAuth2
             NSString *clientSecret = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationSecret];
             NSURL *authorizeURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationAuthorizeURL];
             NSURL *tokenURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationTokenURL];
+            NSURL *revokeURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationRevokeURL];
             NSString *tokenType = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationTokenType];
             NSString *keychainGroup = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationKeyChainGroup];
             NSString *keychainAccessGroup = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup];
@@ -102,6 +105,7 @@ NSString * const NXOAuth2AccountDidFailToGetAccessTokenNotification = @"NXOAuth2
                                                       clientSecret:clientSecret
                                                       authorizeURL:authorizeURL
                                                           tokenURL:tokenURL
+                                                         revokeURL:revokeURL
                                                        accessToken:self.accessToken
                                                          tokenType:tokenType
                                                      keyChainGroup:keychainGroup
@@ -186,12 +190,28 @@ NSString * const NXOAuth2AccountDidFailToGetAccessTokenNotification = @"NXOAuth2
                                                         object:self];
 }
 
+- (void)oauthClientDidRevokeAccessToken:(NXOAuth2Client *)client;
+{
+    accessToken = nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:NXOAuth2AccountDidRevokeAccessTokenNotification
+                                                        object:self];
+}
+
 - (void)oauthClient:(NXOAuth2Client *)client didFailToGetAccessTokenWithError:(NSError *)error;
 {
     accessToken = nil;
     NSDictionary *userInfo = [NSDictionary dictionaryWithObject:error
                                                          forKey:NXOAuth2AccountStoreErrorKey];
     [[NSNotificationCenter defaultCenter] postNotificationName:NXOAuth2AccountDidFailToGetAccessTokenNotification
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+
+- (void)oauthClient:(NXOAuth2Client *)client didFailToRevokeTokenWithError:(NSError *)error;
+{
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:error
+                                                         forKey:NXOAuth2AccountStoreErrorKey];
+    [[NSNotificationCenter defaultCenter] postNotificationName:NXOAuth2AccountDidFailToRevokeAccessTokenNotification
                                                         object:self
                                                       userInfo:userInfo];
 }

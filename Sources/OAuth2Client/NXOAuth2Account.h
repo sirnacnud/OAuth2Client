@@ -21,7 +21,9 @@
 extern NSString * const NXOAuth2AccountDidChangeUserDataNotification;
 extern NSString * const NXOAuth2AccountDidChangeAccessTokenNotification;
 extern NSString * const NXOAuth2AccountDidLoseAccessTokenNotification;
+extern NSString * const NXOAuth2AccountDidRevokeAccessTokenNotification;
 extern NSString * const NXOAuth2AccountDidFailToGetAccessTokenNotification;
+extern NSString * const NXOAuth2AccountDidFailToRevokeAccessTokenNotification;
 
 #pragma mark -
 

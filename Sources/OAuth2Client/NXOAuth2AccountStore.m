@@ -40,6 +40,7 @@ NSString * const kNXOAuth2AccountStoreConfigurationSecret = @"kNXOAuth2AccountSt
 NSString * const kNXOAuth2AccountStoreConfigurationAuthorizeURL = @"kNXOAuth2AccountStoreConfigurationAuthorizeURL";
 NSString * const kNXOAuth2AccountStoreConfigurationTokenURL = @"kNXOAuth2AccountStoreConfigurationTokenURL";
 NSString * const kNXOAuth2AccountStoreConfigurationRedirectURL = @"kNXOAuth2AccountStoreConfigurationRedirectURL";
+NSString * const kNXOAuth2AccountStoreConfigurationRevokeURL = @"kNXOAuth2AccountStoreConfigurationRevokeURL";
 NSString * const kNXOAuth2AccountStoreConfigurationScope = @"kNXOAuth2AccountStoreConfigurationScope";
 NSString * const kNXOAuth2AccountStoreConfigurationTokenType = @"kNXOAuth2AccountStoreConfigurationTokenType";
 NSString * const kNXOAuth2AccountStoreConfigurationTokenRequestHTTPMethod = @"kNXOAuth2AccountStoreConfigurationTokenRequestHTTPMethod";
@@ -330,6 +331,37 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
     [self setConfiguration:config forAccountType:anAccountType];
 }
 
+- (void)setClientID:(NSString *)aClientID
+             secret:(NSString *)aSecret
+              scope:(NSSet *)theScope
+   authorizationURL:(NSURL *)anAuthorizationURL
+           tokenURL:(NSURL *)aTokenURL
+          revokeURL:(NSURL *)aRevokeURL
+        redirectURL:(NSURL *)aRedirectURL
+      keyChainGroup:(NSString *)aKeyChainGroup
+     forAccountType:(NSString *)anAccountType;
+{
+    NSAssert(aKeyChainGroup, @"keyChainGroup must be non-nil");
+    NSAssert(aRevokeURL, @"revokeURL must be non-nil");
+    
+    NSMutableDictionary* config = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   aClientID, kNXOAuth2AccountStoreConfigurationClientID,
+                                   aSecret, kNXOAuth2AccountStoreConfigurationSecret,
+                                   theScope, kNXOAuth2AccountStoreConfigurationScope,
+                                   anAuthorizationURL, kNXOAuth2AccountStoreConfigurationAuthorizeURL,
+                                   aTokenURL, kNXOAuth2AccountStoreConfigurationTokenURL,
+                                   aRevokeURL, kNXOAuth2AccountStoreConfigurationRevokeURL,
+                                   aKeyChainGroup, kNXOAuth2AccountStoreConfigurationKeyChainGroup,
+                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL, nil];
+    
+    if (self.keychainAccessGroup) {
+        [config setObject:self.keychainAccessGroup
+                   forKey:kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup];
+    }
+    
+    [self setConfiguration:config forAccountType:anAccountType];
+}
+
 - (void)setConfiguration:(NSDictionary *)configuration
           forAccountType:(NSString *)accountType;
 {
@@ -457,6 +489,7 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
             NSSet *scope = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationScope];
             NSURL *authorizeURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationAuthorizeURL];
             NSURL *tokenURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationTokenURL];
+            NSURL *revokeURL = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationRevokeURL];
             NSString *tokenType = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationTokenType];
             NSString *tokenRequestHTTPMethod = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationTokenRequestHTTPMethod];
             NSString *keychainGroup = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationKeyChainGroup];
@@ -468,6 +501,7 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
                                                  clientSecret:clientSecret
                                                  authorizeURL:authorizeURL
                                                      tokenURL:tokenURL
+                                                    revokeURL:revokeURL
                                                   accessToken:nil
                                                     tokenType:tokenType
                                                 keyChainGroup:keychainGroup
