@@ -251,6 +251,12 @@ sendingProgressHandler:(NXOAuth2ConnectionSendingProgressHandler)aSendingProgres
             NSString *query = [[aRequest.URL nxoauth2_URLByAddingParameters:parameters] query];
             [aRequest setHTTPBody:[query dataUsingEncoding:NSUTF8StringEncoding]];
             
+        } else if ([contentType isEqualToString:@"application/json"]) {
+            NSError *error;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+            if (!error) {
+                [aRequest setHTTPBody:jsonData];
+            }
         }
 
     }
