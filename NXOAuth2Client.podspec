@@ -39,6 +39,8 @@ Pod::Spec.new do |s|
   s.frameworks = 'Security'
   s.requires_arc = true
   s.default_subspec = 'Core'
+  s.ios.deployment_target = '6.0'
+  s.osx.deployment_target = '10.6'
 
   s.subspec 'Core' do |c|
     c.source_files = 'NXOAuth2Account+Private.h', 'Sources/', 'Sources/OAuth2Client/'
