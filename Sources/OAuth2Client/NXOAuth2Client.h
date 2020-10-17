@@ -36,6 +36,7 @@ extern NSString * const NXOAuth2ClientConnectionContextTokenRevoke;
 @protected
     BOOL authenticating;
     BOOL persistent;
+    BOOL skipURLResponseCaching;
 
     NSString    *clientId;
     NSString    *clientSecret;
@@ -95,6 +96,12 @@ extern NSString * const NXOAuth2ClientConnectionContextTokenRevoke;
  * Defaults to YES
  */
 @property (nonatomic, assign, readwrite, getter=isPersistent) BOOL persistent;
+
+/*!
+* If set to YES, the NSURLRequest responses won't be cached.
+* Defaults to NO
+*/
+@property (nonatomic, assign) BOOL skipURLResponseCaching;
 
 /*!
  * Initializes the Client

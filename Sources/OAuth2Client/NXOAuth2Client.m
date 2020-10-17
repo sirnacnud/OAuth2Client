@@ -111,6 +111,7 @@ NSString * const NXOAuth2ClientConnectionContextTokenRevoke = @"tokenRevoke";
         
         self.persistent = shouldPersist;
         self.delegate = aDelegate;
+        self.skipURLResponseCaching = NO;
     }
     return self;
 }
@@ -125,7 +126,7 @@ NSString * const NXOAuth2ClientConnectionContextTokenRevoke = @"tokenRevoke";
 
 @synthesize clientId, clientSecret, tokenType;
 @synthesize desiredScope, userAgent;
-@synthesize delegate, persistent, accessToken, authenticating;
+@synthesize delegate, persistent, skipURLResponseCaching, accessToken, authenticating;
 @synthesize additionalAuthenticationParameters;
 @synthesize authConnection = authConnection;
 

@@ -48,6 +48,7 @@ NSString * const kNXOAuth2AccountStoreConfigurationKeyChainGroup = @"kNXOAuth2Ac
 NSString * const kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup = @"kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup";
 NSString * const kNXOAuth2AccountStoreConfigurationAdditionalAuthenticationParameters = @"kNXOAuth2AccountStoreConfigurationAdditionalAuthenticationParameters";
 NSString * const kNXOAuth2AccountStoreConfigurationCustomHeaderFields = @"kNXOAuth2AccountStoreConfigurationCustomHeaderFields";
+NSString * const kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching = @"kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching";
 
 #pragma mark Account Type
 
@@ -255,14 +256,16 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
    authorizationURL:(NSURL *)anAuthorizationURL
            tokenURL:(NSURL *)aTokenURL
         redirectURL:(NSURL *)aRedirectURL
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 {
     NSMutableDictionary* config = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                    aClientID, kNXOAuth2AccountStoreConfigurationClientID,
                                    aSecret, kNXOAuth2AccountStoreConfigurationSecret,
                                    anAuthorizationURL, kNXOAuth2AccountStoreConfigurationAuthorizeURL,
                                    aTokenURL, kNXOAuth2AccountStoreConfigurationTokenURL,
-                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL, nil];
+                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL,
+                                   @(aSkipURLResponseCaching), kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching, nil];
     
     if (self.keychainAccessGroup) {
         [config setObject:self.keychainAccessGroup
@@ -279,7 +282,8 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
            tokenURL:(NSURL *)aTokenURL
         redirectURL:(NSURL *)aRedirectURL
       keyChainGroup:(NSString *)aKeyChainGroup
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 {
     NSAssert(aKeyChainGroup, @"keyChainGroup must be non-nil");
     
@@ -290,7 +294,8 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
                                    anAuthorizationURL, kNXOAuth2AccountStoreConfigurationAuthorizeURL,
                                    aTokenURL, kNXOAuth2AccountStoreConfigurationTokenURL,
                                    aKeyChainGroup, kNXOAuth2AccountStoreConfigurationKeyChainGroup,
-                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL, nil];
+                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL,
+                                   @(aSkipURLResponseCaching), kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching, nil];
     
     if (self.keychainAccessGroup) {
         [config setObject:self.keychainAccessGroup
@@ -308,7 +313,8 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
         redirectURL:(NSURL *)aRedirectURL
       keyChainGroup:(NSString *)aKeyChainGroup
           tokenType:(NSString *)aTokenType
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 {
     NSAssert(aKeyChainGroup, @"keyChainGroup must be non-nil");
     NSAssert(aTokenType, @"tokenType must be non-nil");
@@ -321,7 +327,8 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
                                    aTokenURL, kNXOAuth2AccountStoreConfigurationTokenURL,
                                    aTokenType, kNXOAuth2AccountStoreConfigurationTokenType,
                                    aKeyChainGroup, kNXOAuth2AccountStoreConfigurationKeyChainGroup,
-                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL, nil];
+                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL,
+                                   @(aSkipURLResponseCaching), kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching, nil];
     
     if (self.keychainAccessGroup) {
         [config setObject:self.keychainAccessGroup
@@ -339,7 +346,8 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
           revokeURL:(NSURL *)aRevokeURL
         redirectURL:(NSURL *)aRedirectURL
       keyChainGroup:(NSString *)aKeyChainGroup
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 {
     NSAssert(aKeyChainGroup, @"keyChainGroup must be non-nil");
     NSAssert(aRevokeURL, @"revokeURL must be non-nil");
@@ -352,7 +360,8 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
                                    aTokenURL, kNXOAuth2AccountStoreConfigurationTokenURL,
                                    aRevokeURL, kNXOAuth2AccountStoreConfigurationRevokeURL,
                                    aKeyChainGroup, kNXOAuth2AccountStoreConfigurationKeyChainGroup,
-                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL, nil];
+                                   aRedirectURL, kNXOAuth2AccountStoreConfigurationRedirectURL,
+                                   @(aSkipURLResponseCaching), kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching, nil];
     
     if (self.keychainAccessGroup) {
         [config setObject:self.keychainAccessGroup
@@ -496,6 +505,7 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
             NSString *keychainAccessGroup = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup];
             NSDictionary *additionalAuthenticationParameters = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationAdditionalAuthenticationParameters];
             NSDictionary *customHeaderFields = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationCustomHeaderFields];
+            NSNumber *skipURLResponseCaching = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching];
 
             client = [[NXOAuth2Client alloc] initWithClientID:clientID
                                                  clientSecret:clientSecret
@@ -511,6 +521,10 @@ NSString * const kNXOAuth2AccountStoreAccountType = @"kNXOAuth2AccountStoreAccou
 
             client.persistent = NO;
 
+            if (skipURLResponseCaching != nil) {
+                client.skipURLResponseCaching = [skipURLResponseCaching boolValue];
+            }
+            
             if (tokenRequestHTTPMethod != nil) {
                 client.tokenRequestHTTPMethod = tokenRequestHTTPMethod;
             }

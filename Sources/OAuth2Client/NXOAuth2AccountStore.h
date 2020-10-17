@@ -38,6 +38,7 @@ extern NSString * const kNXOAuth2AccountStoreConfigurationTokenType;
 extern NSString * const kNXOAuth2AccountStoreConfigurationTokenRequestHTTPMethod;
 extern NSString * const kNXOAuth2AccountStoreConfigurationKeyChainGroup;
 extern NSString * const kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup;
+extern NSString * const kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching;
 
 /* 
  * Requires a NSDictionary as a value.
@@ -96,7 +97,8 @@ typedef void(^NXOAuth2PreparedAuthorizationURLHandler)(NSURL *preparedURL);
    authorizationURL:(NSURL *)anAuthorizationURL
            tokenURL:(NSURL *)aTokenURL
         redirectURL:(NSURL *)aRedirectURL
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 
 - (void)setClientID:(NSString *)aClientID
              secret:(NSString *)aSecret
@@ -105,7 +107,8 @@ typedef void(^NXOAuth2PreparedAuthorizationURLHandler)(NSURL *preparedURL);
            tokenURL:(NSURL *)aTokenURL
         redirectURL:(NSURL *)aRedirectURL
       keyChainGroup:(NSString *)aKeyChainGroup
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 
 - (void)setClientID:(NSString *)aClientID
              secret:(NSString *)aSecret
@@ -115,7 +118,8 @@ typedef void(^NXOAuth2PreparedAuthorizationURLHandler)(NSURL *preparedURL);
         redirectURL:(NSURL *)aRedirectURL
       keyChainGroup:(NSString *)aKeyChainGroup
           tokenType:(NSString *)aTokenType
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 
 - (void)setClientID:(NSString *)aClientID
              secret:(NSString *)aSecret
@@ -125,7 +129,8 @@ typedef void(^NXOAuth2PreparedAuthorizationURLHandler)(NSURL *preparedURL);
           revokeURL:(NSURL *)aRevokeURL
         redirectURL:(NSURL *)aRedirectURL
       keyChainGroup:(NSString *)aKeyChainGroup
-     forAccountType:(NSString *)anAccountType;
+     forAccountType:(NSString *)anAccountType
+skippingURLResponseCaching:(BOOL)aSkipURLResponseCaching;
 
 - (void)setConfiguration:(NSDictionary *)configuration forAccountType:(NSString *)accountType;
 

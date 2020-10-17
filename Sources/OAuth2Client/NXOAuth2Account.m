@@ -100,6 +100,7 @@ NSString * const NXOAuth2AccountDidFailToRevokeAccessTokenNotification = @"NXOAu
             NSString *keychainAccessGroup = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationKeyChainAccessGroup];
             NSDictionary *additionalQueryParams = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationAdditionalAuthenticationParameters];
             NSDictionary *customHeaderFields = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationCustomHeaderFields];
+            NSNumber *skipURLResponseCaching = [configuration objectForKey:kNXOAuth2AccountStoreConfigurationSkipURLResponseCaching];
 
             oauthClient = [[NXOAuth2Client alloc] initWithClientID:clientID
                                                       clientSecret:clientSecret
@@ -119,7 +120,11 @@ NSString * const NXOAuth2AccountDidFailToRevokeAccessTokenNotification = @"NXOAu
             if (customHeaderFields) {
                 oauthClient.customHeaderFields = customHeaderFields;
             }
-
+            
+            if (skipURLResponseCaching != nil) {
+                oauthClient.skipURLResponseCaching = [skipURLResponseCaching boolValue];
+            }
+            
         }
     }
     return oauthClient;

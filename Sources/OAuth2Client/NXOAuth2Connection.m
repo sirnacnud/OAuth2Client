@@ -198,6 +198,10 @@ sendingProgressHandler:(NXOAuth2ConnectionSendingProgressHandler)aSendingProgres
         [startRequest setValue:client.acceptType forHTTPHeaderField:@"Accept"];
     }
     
+    if (client.skipURLResponseCaching) {
+        [startRequest setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+    }
+    
     NSURLConnection *aConnection = [[NSURLConnection alloc] initWithRequest:startRequest delegate:self startImmediately:NO];    // don't start yet
     [aConnection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];    // let's first schedule it in the current runloop. (see http://github.com/soundcloud/cocoa-api-wrapper/issues#issue/2 )
     [aConnection start];    // now start
@@ -452,6 +456,14 @@ sendingProgressHandler:(NXOAuth2ConnectionSendingProgressHandler)aSendingProgres
     }
     if ([delegate respondsToSelector:@selector(oauthConnection:didReceiveData:)]) {
         [delegate oauthConnection:self didReceiveData:someData];
+    }
+}
+
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
+    if (client.skipURLResponseCaching) {
+        return nil;
+    } else {
+        return cachedResponse;
     }
 }
 
